@@ -95,6 +95,56 @@ Glosario (usar siempre la misma palabra): `imagen`, `lote`, `conversion`,
 - Requiere servirse por HTTP (el `.wasm` se carga con `fetch`); no funciona
   abriendo `index.html` con `file://`.
 
+## Estructura
+
+```
+index.html
+css/estilos.css
+js/externos/                 jsquash-webp.js, webp_enc.wasm, webp_enc_simd.wasm, fflate.js
+js/configuracion.js          Constantes: ICONOS, límites, trabajadores, calidad por defecto
+js/formato.js                Textos: pesos, porcentajes, MP, nombre del ZIP con fecha
+js/almacen-opciones.js       Leer y guardar las opciones en localStorage
+js/lectura-imagenes.js       Tipo, dimensiones, WebP animado, límites y decodificar a píxeles
+js/cola-conversion.js        Pool de trabajadores, cola, cancelar, reemplazar al fallar
+js/descarga.js               Descarga individual, ZIP y nombres sin repetir
+js/vista-carga.js            pintarCarga()
+js/vista-configuracion.js    pintarConfiguracion() y botones de ayuda (i)
+js/vista-resultados.js       pintarResultados()
+js/aplicacion.js             Estado, eventos y cambio de vista (siempre al final)
+js/trabajador-conversion.js  Worker; no se carga con <script>
+```
+
+Los `<script>` se cargan en ese orden (`externos/fflate.js` primero).
+
+- **Las vistas solo pintan:** reciben el estado y arman el DOM.
+- **Solo `aplicacion.js` cambia el estado:** registra los eventos, modifica el
+  estado y llama al `pintar...()` de la vista.
+- **Los módulos del medio no tocan el DOM:** `lectura-imagenes.js`,
+  `cola-conversion.js` y `descarga.js` reciben datos y avisan con funciones
+  que les pasa `aplicacion.js`.
+
+```js
+const estado = {
+    vista: "carga",                  // "carga" | "configuracion" | "resultados"
+    estaArrastrando: false,
+    opciones: { esSinPerdida: false, calidad: 75 },
+    imagenes: [],
+    estaConvirtiendo: false
+};
+
+// Cada imagen del lote
+{
+    id: 1,
+    archivo: File,
+    ancho: 5712,
+    alto: 4284,
+    estadoConversion: "en-cola",     // "en-cola" | "convirtiendo" | "lista" | "rechazada" | "cancelada"
+    motivo: "",                      // Texto visible si está rechazada
+    webp: null,                      // Blob al terminar
+    urlWebp: ""                      // Descarga individual; se libera con revokeObjectURL
+}
+```
+
 ## Conversión
 
 - Códec: **jSquash** (libwebp compilado a WASM, el mismo de Squoosh). No se
@@ -255,16 +305,18 @@ mínimas y un azul de acento. Claro u oscuro según el sistema operativo.
   de desplazamiento y selector de archivos usen el estilo nativo del tema.
 - `accent-color: var(--color-acento)` para checkbox y slider nativos.
 - No se usa la palabra clave CSS `AccentColor` (Chrome no la soporta).
-- Paleta inicial (verificar contraste AA al implementar):
+- Paleta (contraste AA verificado para texto; `#0a84ff` en oscuro se descartó: 3,65 con texto blanco):
 
 | Variable | Claro | Oscuro | Uso |
 |---|---|---|---|
 | `--color-fondo` | `#f3f3f3` | `#202020` | Fondo de la ventana |
 | `--color-superficie` | `#ffffff` | `#2b2b2b` | Paneles, lista, zona de carga |
 | `--color-borde` | `#e0e0e0` | `#3a3a3a` | Bordes y separadores |
+| `--color-borde-zona` | `#b8b8b8` | `#5a5a5a` | Borde punteado de la zona de carga |
+| `--color-acento-suave` | `#e5f0fa` | `#1a2c40` | Fondo de la zona al arrastrar |
 | `--color-texto` | `#1d1d1f` | `#f5f5f7` | Texto principal |
 | `--color-texto-secundario` | `#6e6e73` | `#a1a1a6` | Detalles, ayudas, tamaños |
-| `--color-acento` | `#0067c0` | `#0a84ff` | Botón principal, enlaces, foco |
+| `--color-acento` | `#0067c0` | `#0070e0` | Fondo del botón principal, bordes y foco (no como color de texto en oscuro: 3,4 sobre el fondo) |
 | `--color-texto-sobre-acento` | `#ffffff` | `#ffffff` | Texto del botón principal |
 | `--color-ahorro` | `#0f7b0f` | `#6ccb5f` | Porcentaje de ahorro |
 | `--color-aumento` | `#c42b1c` | `#ff99a4` | Peso que aumenta, rechazadas |

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="Convierte imágenes PNG, JPG y WebP a WebP por lote, directo en tu navegador. Tus imágenes no salen de tu dispositivo.">
+    <title>Conversor WebP</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+    <header class="encabezado">
+        <div class="contenedor">
+            <h1 class="encabezado-titulo">Conversor WebP</h1>
+        </div>
+    </header>
+
+    <main class="contenedor">
+        <section id="vista-carga" aria-label="Elegir imágenes">
+            <label class="zona-carga" id="zona-carga">
+                <input class="oculto-visualmente" id="zona-carga-entrada" type="file"
+                    accept="image/png,image/jpeg,image/webp" multiple>
+                <span class="zona-carga-icono" id="zona-carga-icono" aria-hidden="true"></span>
+                <span class="zona-carga-titulo">Arrastra tus imágenes aquí o</span>
+                <span class="boton boton-principal">Elegir imágenes</span>
+                <span class="zona-carga-detalle" id="zona-carga-detalle"></span>
+            </label>
+            <p class="privacidad">
+                <span id="privacidad-icono" aria-hidden="true"></span>
+                Tus imágenes se procesan en tu propio dispositivo. No se envían a ningún lado.
+            </p>
+        </section>
+
+        <section id="vista-configuracion" aria-label="Opciones de conversión" hidden>
+            <p class="resumen" id="configuracion-resumen"></p>
+            <p class="resumen-aviso" id="configuracion-aviso" hidden></p>
+            <button class="boton" id="boton-volver" type="button">Volver</button>
+        </section>
+    </main>
+
+    <script src="js/configuracion.js"></script>
+    <script src="js/formato.js"></script>
+    <script src="js/lectura-imagenes.js"></script>
+    <script src="js/vista-carga.js"></script>
+    <script src="js/vista-configuracion.js"></script>
+    <script src="js/aplicacion.js"></script>
+</body>
+</html>

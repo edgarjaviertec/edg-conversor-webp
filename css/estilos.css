@@ -1,0 +1,242 @@
+/* ==========================================================================
+   CONFIGURACION
+   ========================================================================== */
+
+:root {
+    color-scheme: light dark;
+
+    --color-fondo: #f3f3f3;
+    --color-superficie: #ffffff;
+    --color-borde: #e0e0e0;
+    --color-borde-zona: #b8b8b8;
+    --color-texto: #1d1d1f;
+    --color-texto-secundario: #6e6e73;
+    --color-acento: #0067c0;
+    --color-acento-suave: #e5f0fa;
+    --color-texto-sobre-acento: #ffffff;
+    --color-ahorro: #0f7b0f;
+    --color-aumento: #c42b1c;
+
+    --fuente-sistema: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --tamano-texto: 1rem;
+    --tamano-texto-pequeno: 0.875rem;
+    --tamano-titulo: 1.125rem;
+    --tamano-icono-carga: 3rem;
+    --altura-linea: 1.5;
+    --peso-negrita: 600;
+
+    --espacio-pequeno: 8px;
+    --espacio-medio: 16px;
+    --espacio-grande: 32px;
+    --espacio-zona-movil: 32px;
+    --espacio-zona-escritorio: 64px;
+
+    --radio: 8px;
+    --grosor-borde: 1px;
+    --grosor-borde-zona: 2px;
+    --grosor-foco: 2px;
+    --ancho-contenido: 720px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-fondo: #202020;
+        --color-superficie: #2b2b2b;
+        --color-borde: #3a3a3a;
+        --color-borde-zona: #5a5a5a;
+        --color-texto: #f5f5f7;
+        --color-texto-secundario: #a1a1a6;
+        --color-acento: #0070e0;
+        --color-acento-suave: #1a2c40;
+        --color-texto-sobre-acento: #ffffff;
+        --color-ahorro: #6ccb5f;
+        --color-aumento: #ff99a4;
+    }
+}
+
+
+/* ==========================================================================
+   GENERICOS
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body,
+h1,
+p {
+    margin: 0;
+}
+
+
+/* ==========================================================================
+   ELEMENTOS
+   ========================================================================== */
+
+body {
+    min-height: 100vh;
+    font-family: var(--fuente-sistema);
+    font-size: var(--tamano-texto);
+    line-height: var(--altura-linea);
+    color: var(--color-texto);
+    background-color: var(--color-fondo);
+    accent-color: var(--color-acento);
+}
+
+
+/* ==========================================================================
+   OBJETOS
+   ========================================================================== */
+
+.contenedor {
+    max-width: var(--ancho-contenido);
+    margin: 0 auto;
+    padding: var(--espacio-medio);
+}
+
+
+/* ==========================================================================
+   COMPONENTES
+   ========================================================================== */
+
+/* Encabezado */
+
+.encabezado {
+    background-color: var(--color-superficie);
+    border-bottom: var(--grosor-borde) solid var(--color-borde);
+}
+
+.encabezado-titulo {
+    font-size: var(--tamano-titulo);
+    font-weight: var(--peso-negrita);
+}
+
+/* Botones */
+
+.boton {
+    display: inline-block;
+    padding: var(--espacio-pequeno) var(--espacio-medio);
+    font: inherit;
+    font-weight: var(--peso-negrita);
+    color: var(--color-texto);
+    background-color: var(--color-superficie);
+    border: var(--grosor-borde) solid var(--color-borde);
+    border-radius: var(--radio);
+    cursor: pointer;
+}
+
+.boton-principal {
+    color: var(--color-texto-sobre-acento);
+    background-color: var(--color-acento);
+    border-color: var(--color-acento);
+}
+
+/* Zona de carga */
+
+.zona-carga {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--espacio-medio);
+    padding: var(--espacio-zona-movil) var(--espacio-medio);
+    text-align: center;
+    background-color: var(--color-superficie);
+    border: var(--grosor-borde-zona) dashed var(--color-borde-zona);
+    border-radius: var(--radio);
+    cursor: pointer;
+}
+
+.zona-carga.esta-arrastrando {
+    background-color: var(--color-acento-suave);
+    border-color: var(--color-acento);
+}
+
+.zona-carga:focus-within {
+    outline: var(--grosor-foco) solid var(--color-acento);
+    outline-offset: var(--grosor-foco);
+}
+
+/* Sin esto, pasar sobre un hijo dispara dragleave y el resaltado parpadea */
+.zona-carga * {
+    pointer-events: none;
+}
+
+.zona-carga-icono {
+    font-size: var(--tamano-icono-carga);
+    line-height: 1;
+}
+
+/* En móvil no se puede arrastrar: solo se muestra el botón */
+.zona-carga-titulo {
+    display: none;
+    font-size: var(--tamano-titulo);
+}
+
+.zona-carga-detalle {
+    font-size: var(--tamano-texto-pequeno);
+    color: var(--color-texto-secundario);
+}
+
+.privacidad {
+    margin-top: var(--espacio-medio);
+    font-size: var(--tamano-texto-pequeno);
+    text-align: center;
+    color: var(--color-texto-secundario);
+}
+
+/* Configuración */
+
+.resumen {
+    font-weight: var(--peso-negrita);
+}
+
+.resumen-aviso {
+    margin-bottom: var(--espacio-medio);
+    font-size: var(--tamano-texto-pequeno);
+    color: var(--color-aumento);
+}
+
+/* Escritorio */
+
+@media (min-width: 768px) {
+    .contenedor {
+        padding: var(--espacio-grande) var(--espacio-medio);
+    }
+
+    .encabezado .contenedor {
+        padding-top: var(--espacio-medio);
+        padding-bottom: var(--espacio-medio);
+    }
+
+    .zona-carga {
+        padding: var(--espacio-zona-escritorio) var(--espacio-grande);
+    }
+
+    .zona-carga-titulo {
+        display: block;
+    }
+}
+
+
+/* ==========================================================================
+   UTILIDADES
+   ========================================================================== */
+
+/* Las clases con display propio no deben ganarle al atributo hidden */
+[hidden] {
+    display: none !important;
+}
+
+/* Oculto a la vista, pero accesible para teclado y lectores de pantalla */
+.oculto-visualmente {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    white-space: nowrap !important;
+}
