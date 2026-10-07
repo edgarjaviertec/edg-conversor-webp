@@ -36,6 +36,9 @@
     --grosor-borde-zona: 2px;
     --grosor-foco: 2px;
     --ancho-contenido: 720px;
+    --reserva-barra-inferior: 96px;
+    --tamano-boton-ayuda: 32px;
+    --opacidad-deshabilitado: 0.5;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -134,6 +137,21 @@ body {
     border-color: var(--color-acento);
 }
 
+.boton:disabled {
+    opacity: var(--opacidad-deshabilitado);
+    cursor: not-allowed;
+}
+
+/* Paneles */
+
+.panel {
+    padding: var(--espacio-medio);
+    margin-bottom: var(--espacio-medio);
+    background-color: var(--color-superficie);
+    border: var(--grosor-borde) solid var(--color-borde);
+    border-radius: var(--radio);
+}
+
 /* Zona de carga */
 
 .zona-carga {
@@ -195,9 +213,85 @@ body {
 }
 
 .resumen-aviso {
-    margin-bottom: var(--espacio-medio);
     font-size: var(--tamano-texto-pequeno);
     color: var(--color-aumento);
+}
+
+/* Opciones */
+
+.opcion + .opcion {
+    margin-top: var(--espacio-medio);
+}
+
+.opcion-fila {
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-pequeno);
+}
+
+.opcion-etiqueta {
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-pequeno);
+    font-weight: var(--peso-negrita);
+    cursor: pointer;
+}
+
+.opcion-ayuda-boton {
+    width: var(--tamano-boton-ayuda);
+    height: var(--tamano-boton-ayuda);
+    padding: 0;
+    font: inherit;
+    background: none;
+    border: none;
+    border-radius: var(--radio);
+    cursor: pointer;
+}
+
+.opcion-ayuda-boton[aria-expanded="true"] {
+    background-color: var(--color-acento-suave);
+}
+
+.opcion-valor {
+    margin-left: auto;
+    font-weight: var(--peso-negrita);
+    font-variant-numeric: tabular-nums;
+}
+
+.opcion-deslizador {
+    width: 100%;
+    margin: var(--espacio-pequeno) 0 0;
+}
+
+.opcion-ayuda {
+    padding: var(--espacio-pequeno) var(--espacio-medio);
+    margin-top: var(--espacio-pequeno);
+    font-size: var(--tamano-texto-pequeno);
+    color: var(--color-texto-secundario);
+    background-color: var(--color-acento-suave);
+    border-radius: var(--radio);
+}
+
+/* Barra inferior: fija en móvil para tener la acción principal a mano */
+
+.principal {
+    padding-bottom: var(--reserva-barra-inferior);
+}
+
+.barra-inferior {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    gap: var(--espacio-pequeno);
+    padding: var(--espacio-medio);
+    background-color: var(--color-superficie);
+    border-top: var(--grosor-borde) solid var(--color-borde);
+}
+
+.barra-inferior .boton-principal {
+    flex: 1;
 }
 
 /* Escritorio */
@@ -218,6 +312,22 @@ body {
 
     .zona-carga-titulo {
         display: block;
+    }
+
+    .principal {
+        padding-bottom: var(--espacio-grande);
+    }
+
+    .barra-inferior {
+        position: static;
+        justify-content: space-between;
+        padding: 0;
+        background-color: transparent;
+        border-top: none;
+    }
+
+    .barra-inferior .boton-principal {
+        flex: none;
     }
 }
 

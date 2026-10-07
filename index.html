@@ -15,7 +15,7 @@
         </div>
     </header>
 
-    <main class="contenedor">
+    <main class="contenedor principal">
         <section id="vista-carga" aria-label="Elegir imágenes">
             <label class="zona-carga" id="zona-carga">
                 <input class="oculto-visualmente" id="zona-carga-entrada" type="file"
@@ -32,14 +32,60 @@
         </section>
 
         <section id="vista-configuracion" aria-label="Opciones de conversión" hidden>
-            <p class="resumen" id="configuracion-resumen"></p>
-            <p class="resumen-aviso" id="configuracion-aviso" hidden></p>
-            <button class="boton" id="boton-volver" type="button">Volver</button>
+            <div class="panel">
+                <p class="resumen" id="configuracion-resumen"></p>
+                <p class="resumen-aviso" id="configuracion-aviso" hidden></p>
+            </div>
+
+            <div class="panel">
+                <div class="opcion">
+                    <div class="opcion-fila">
+                        <label class="opcion-etiqueta">
+                            <input id="opcion-sin-perdida" type="checkbox">
+                            Sin pérdida
+                        </label>
+                        <button class="opcion-ayuda-boton" id="ayuda-boton-sin-perdida" type="button"
+                            aria-expanded="false" aria-controls="ayuda-sin-perdida"
+                            aria-label="Qué hace Sin pérdida">
+                            <span id="ayuda-icono-sin-perdida" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <p class="opcion-ayuda" id="ayuda-sin-perdida" hidden>
+                        La imagen queda idéntica al original, píxel por píxel. Ideal para logos,
+                        capturas de pantalla e ilustraciones. En fotos el archivo suele pesar más
+                        que el original.
+                    </p>
+                </div>
+
+                <div class="opcion" id="opcion-calidad">
+                    <div class="opcion-fila">
+                        <label class="opcion-etiqueta" for="opcion-calidad-control">Calidad</label>
+                        <button class="opcion-ayuda-boton" id="ayuda-boton-calidad" type="button"
+                            aria-expanded="false" aria-controls="ayuda-calidad"
+                            aria-label="Qué hace Calidad">
+                            <span id="ayuda-icono-calidad" aria-hidden="true"></span>
+                        </button>
+                        <output class="opcion-valor" id="opcion-calidad-valor" for="opcion-calidad-control"></output>
+                    </div>
+                    <input class="opcion-deslizador" id="opcion-calidad-control" type="range"
+                        min="0" max="100" step="1">
+                    <p class="opcion-ayuda" id="ayuda-calidad" hidden>
+                        Con menos calidad el archivo pesa menos, pero pueden aparecer defectos
+                        visibles. Entre 75 y 85 suele ser un buen equilibrio para fotos.
+                    </p>
+                </div>
+            </div>
+
+            <div class="barra-inferior">
+                <button class="boton" id="boton-volver" type="button">Volver</button>
+                <button class="boton boton-principal" id="boton-convertir" type="button">Convertir</button>
+            </div>
         </section>
     </main>
 
     <script src="js/configuracion.js"></script>
     <script src="js/formato.js"></script>
+    <script src="js/almacen-opciones.js"></script>
     <script src="js/lectura-imagenes.js"></script>
     <script src="js/vista-carga.js"></script>
     <script src="js/vista-configuracion.js"></script>

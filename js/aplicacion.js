@@ -1,7 +1,8 @@
 const estado = {
     vista: "carga",
     estaArrastrando: false,
-    opciones: { esSinPerdida: false, calidad: CALIDAD_POR_DEFECTO },
+    opciones: leerOpcionesGuardadas(),
+    ayudaAbierta: "",
     imagenes: [],
     estaConvirtiendo: false
 };
@@ -72,11 +73,66 @@ function registrarEventosCarga() {
     });
 }
 
+function cambiarOpciones(cambios) {
+    Object.assign(estado.opciones, cambios);
+    guardarOpciones(estado.opciones);
+    pintarConfiguracion(estado);
+}
+
+function cambiarAyudaAbierta(idAyuda) {
+    if (estado.ayudaAbierta === idAyuda) return;
+
+    estado.ayudaAbierta = idAyuda;
+    pintarConfiguracion(estado);
+}
+
+function esClicEnAyuda(objetivo) {
+    for (const ayuda of AYUDAS) {
+        if (document.getElementById(ayuda.idAyuda).contains(objetivo)) return true;
+        if (document.getElementById(ayuda.idBoton).contains(objetivo)) return true;
+    }
+    return false;
+}
+
+function registrarEventosAyuda() {
+    for (const ayuda of AYUDAS) {
+        document.getElementById(ayuda.idBoton).addEventListener("click", function () {
+            if (estado.ayudaAbierta === ayuda.idAyuda) {
+                cambiarAyudaAbierta("");
+                return;
+            }
+            cambiarAyudaAbierta(ayuda.idAyuda);
+        });
+    }
+
+    // Un clic fuera de la ayuda y de su botón la cierra
+    document.addEventListener("click", function (evento) {
+        if (esClicEnAyuda(evento.target)) return;
+        cambiarAyudaAbierta("");
+    });
+
+    document.addEventListener("keydown", function (evento) {
+        if (evento.key !== "Escape") return;
+        cambiarAyudaAbierta("");
+    });
+}
+
 function registrarEventosConfiguracion() {
+    document.getElementById("opcion-sin-perdida").addEventListener("change", function (evento) {
+        cambiarOpciones({ esSinPerdida: evento.target.checked });
+    });
+
+    document.getElementById("opcion-calidad-control").addEventListener("input", function (evento) {
+        cambiarOpciones({ calidad: Number(evento.target.value) });
+    });
+
     document.getElementById("boton-volver").addEventListener("click", function () {
         estado.imagenes = [];
+        estado.ayudaAbierta = "";
         mostrarVista("carga");
     });
+
+    registrarEventosAyuda();
 }
 
 registrarEventosCarga();
