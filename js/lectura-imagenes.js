@@ -83,6 +83,26 @@ async function leerImagen(id, archivo) {
     return imagen;
 }
 
+// En el hilo principal porque OffscreenCanvas no existe en iOS 16.0–16.3.
+// createImageBitmap respeta la orientación EXIF y conserva el canal alfa.
+async function decodificarImagen(archivo) {
+    const mapaDeBits = await createImageBitmap(archivo);
+    const lienzo = document.createElement("canvas");
+    lienzo.width = mapaDeBits.width;
+    lienzo.height = mapaDeBits.height;
+
+    const contexto = lienzo.getContext("2d");
+    contexto.drawImage(mapaDeBits, 0, 0);
+    const pixeles = contexto.getImageData(0, 0, lienzo.width, lienzo.height);
+
+    // Liberar el bitmap y el canvas cuanto antes: con fotos grandes son cientos de MB
+    mapaDeBits.close();
+    lienzo.width = 0;
+    lienzo.height = 0;
+
+    return pixeles;
+}
+
 // Una por una para no abrir muchas imágenes a la vez en memoria
 async function leerImagenes(archivos) {
     const imagenes = [];

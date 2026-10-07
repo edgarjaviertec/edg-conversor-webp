@@ -83,6 +83,8 @@ Glosario (usar siempre la misma palabra): `imagen`, `lote`, `conversion`,
   eventos cambian el estado y llaman a la función `pintar...()` de la sección
   afectada; nunca tocan el DOM de otra sección directamente.
 - Las listas se repintan completas con `replaceChildren()` y `<template>`.
+  Dentro de un `<template>` los campos se marcan con `data-campo="..."` para
+  JS (no pueden llevar id porque se repiten, y las clases son solo para CSS).
 - Navegadores: Safari iOS 16+ y las dos últimas versiones de Chrome, Edge,
   Firefox y Safari Mac. Sin polyfills. Lo más nuevo (View Transitions) se usa
   solo si existe: `if (document.startViewTransition)`. No se usa la Popover
@@ -128,8 +130,10 @@ const estado = {
     vista: "carga",                  // "carga" | "configuracion" | "resultados"
     estaArrastrando: false,
     opciones: { esSinPerdida: false, calidad: 75 },
+    ayudaAbierta: "",                // id de la ayuda (i) abierta, o "" si ninguna
     imagenes: [],
-    estaConvirtiendo: false
+    estaConvirtiendo: false,
+    totalLote: 0                     // Imágenes enviadas a convertir, para el progreso
 };
 
 // Cada imagen del lote
@@ -259,10 +263,11 @@ Tres vistas; el estado guarda cuál se muestra:
   pendientes quedan como "Cancelada". Al terminar o cancelar: ahorro total,
   descarga, "Cambiar opciones" (vuelve a configuración con los mismos
   archivos) y "Convertir otras imágenes" (vuelve a carga y descarta todo).
-- **Escritorio:** "Descargar todas (ZIP)" arriba en el resumen y abajo en la
-  `barra-inferior` fija. **Móvil:** la acción principal de cada vista
-  (Convertir, Cancelar, Descargar) en la `barra-inferior` fija y filas de dos
-  líneas.
+- **Barra inferior fija** en móvil y escritorio con la acción principal de
+  cada vista (Convertir, Cancelar, Descargar), siempre visible aunque la
+  lista sea larga. En resultados, "Cambiar opciones" y "Convertir otras
+  imágenes" van como enlaces secundarios en la misma barra. Filas de dos
+  líneas en móvil y de una en escritorio.
 - **Descarga:** si hay una sola imagen convertida, el botón dice
   "Descargar imagen" y baja el `.webp` directo; con dos o más, "Descargar
   todas (ZIP)". ZIP con `fflate`, solo con las convertidas, llamado

@@ -77,18 +77,57 @@
             </div>
 
             <div class="barra-inferior">
-                <button class="boton" id="boton-volver" type="button">Volver</button>
-                <button class="boton boton-principal" id="boton-convertir" type="button">Convertir</button>
+                <div class="barra-inferior-contenido">
+                    <button class="boton" id="boton-volver" type="button">Volver</button>
+                    <button class="boton boton-principal" id="boton-convertir" type="button">Convertir</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="vista-resultados" aria-label="Resultados" hidden>
+            <div class="panel">
+                <p class="resumen" id="resultados-titulo" aria-live="polite"></p>
+                <p class="resumen-detalle" id="resultados-detalle"></p>
+                <progress class="progreso" id="resultados-progreso" max="1" value="0"></progress>
+            </div>
+
+            <ul class="lista-resultados" id="lista-resultados"></ul>
+
+            <template id="plantilla-fila-resultado">
+                <li class="fila-resultado">
+                    <span class="fila-resultado-nombre" data-campo="nombre"></span>
+                    <span class="fila-resultado-detalle">
+                        <span class="indicador-giro" data-campo="indicador" aria-hidden="true"></span>
+                        <span class="fila-resultado-texto" data-campo="texto"></span>
+                        <span class="fila-resultado-cambio" data-campo="cambio"></span>
+                        <a class="boton boton-pequeno" data-campo="descarga">Descargar</a>
+                    </span>
+                </li>
+            </template>
+
+            <div class="barra-inferior">
+                <div class="barra-inferior-contenido barra-inferior-resultados">
+                    <div class="barra-inferior-secundaria" id="acciones-secundarias">
+                        <button class="boton-texto" id="boton-cambiar-opciones" type="button">Cambiar opciones</button>
+                        <button class="boton-texto" id="boton-otras-imagenes" type="button">Convertir otras imágenes</button>
+                    </div>
+                    <button class="boton" id="boton-cancelar" type="button">Cancelar</button>
+                    <button class="boton boton-principal" id="boton-descargar" type="button"></button>
+                </div>
             </div>
         </section>
     </main>
 
+    <script src="js/externos/fflate.js"></script>
     <script src="js/configuracion.js"></script>
     <script src="js/formato.js"></script>
     <script src="js/almacen-opciones.js"></script>
     <script src="js/lectura-imagenes.js"></script>
+    <script src="js/cola-conversion.js"></script>
+    <script src="js/descarga.js"></script>
     <script src="js/vista-carga.js"></script>
     <script src="js/vista-configuracion.js"></script>
+    <script src="js/vista-resultados.js"></script>
     <script src="js/aplicacion.js"></script>
 </body>
 </html>

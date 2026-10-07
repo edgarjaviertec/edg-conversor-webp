@@ -32,11 +32,17 @@
     --espacio-zona-escritorio: 64px;
 
     --radio: 8px;
+    --radio-circulo: 50%;
     --grosor-borde: 1px;
     --grosor-borde-zona: 2px;
     --grosor-foco: 2px;
     --ancho-contenido: 720px;
-    --reserva-barra-inferior: 96px;
+    --reserva-barra-inferior-movil: 160px;
+    --reserva-barra-inferior-escritorio: 112px;
+    --espacio-mini: 4px;
+    --tamano-indicador: 14px;
+    --duracion-giro: 0.8s;
+    --duracion-giro-lento: 2.4s;
     --tamano-boton-ayuda: 32px;
     --opacidad-deshabilitado: 0.5;
 }
@@ -272,10 +278,116 @@ body {
     border-radius: var(--radio);
 }
 
-/* Barra inferior: fija en móvil para tener la acción principal a mano */
+/* Resultados */
+
+.resumen-detalle {
+    font-size: var(--tamano-texto-pequeno);
+    color: var(--color-texto-secundario);
+}
+
+.progreso {
+    width: 100%;
+    margin-top: var(--espacio-pequeno);
+}
+
+.lista-resultados {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    background-color: var(--color-superficie);
+    border: var(--grosor-borde) solid var(--color-borde);
+    border-radius: var(--radio);
+}
+
+.fila-resultado {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espacio-mini);
+    padding: var(--espacio-pequeno) var(--espacio-medio);
+}
+
+.fila-resultado + .fila-resultado {
+    border-top: var(--grosor-borde) solid var(--color-borde);
+}
+
+.fila-resultado-nombre {
+    min-width: 0;
+    overflow: hidden;
+    font-weight: var(--peso-negrita);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fila-resultado-detalle {
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-pequeno);
+    font-size: var(--tamano-texto-pequeno);
+    color: var(--color-texto-secundario);
+}
+
+.fila-resultado-texto.esta-rechazada {
+    color: var(--color-aumento);
+}
+
+.fila-resultado-cambio {
+    margin-left: auto;
+    font-weight: var(--peso-negrita);
+    font-variant-numeric: tabular-nums;
+}
+
+.fila-resultado-cambio.tiene-ahorro {
+    color: var(--color-ahorro);
+}
+
+.fila-resultado-cambio.tiene-aumento {
+    color: var(--color-aumento);
+}
+
+.boton-pequeno {
+    padding: var(--espacio-mini) var(--espacio-pequeno);
+    font-size: var(--tamano-texto-pequeno);
+    text-decoration: none;
+}
+
+.boton-texto {
+    padding: var(--espacio-mini) 0;
+    font: inherit;
+    font-size: var(--tamano-texto-pequeno);
+    color: var(--color-texto);
+    text-decoration: underline;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Sin progreso dentro de una imagen, el giro muestra que la app sigue trabajando */
+.indicador-giro {
+    flex: none;
+    width: var(--tamano-indicador);
+    height: var(--tamano-indicador);
+    border: var(--grosor-foco) solid var(--color-borde);
+    border-top-color: var(--color-acento);
+    border-radius: var(--radio-circulo);
+    animation: girar var(--duracion-giro) linear infinite;
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .indicador-giro {
+        animation-duration: var(--duracion-giro-lento);
+    }
+}
+
+/* Barra inferior: fija para tener siempre a mano la acción principal */
 
 .principal {
-    padding-bottom: var(--reserva-barra-inferior);
+    padding-bottom: var(--reserva-barra-inferior-movil);
 }
 
 .barra-inferior {
@@ -283,15 +395,32 @@ body {
     right: 0;
     bottom: 0;
     left: 0;
-    display: flex;
-    gap: var(--espacio-pequeno);
     padding: var(--espacio-medio);
     background-color: var(--color-superficie);
     border-top: var(--grosor-borde) solid var(--color-borde);
 }
 
-.barra-inferior .boton-principal {
+.barra-inferior-contenido {
+    display: flex;
+    gap: var(--espacio-pequeno);
+    max-width: var(--ancho-contenido);
+    margin: 0 auto;
+}
+
+.barra-inferior-contenido .boton-principal {
     flex: 1;
+}
+
+/* En móvil, la acción principal arriba y las secundarias debajo */
+.barra-inferior-resultados {
+    flex-direction: column-reverse;
+}
+
+.barra-inferior-secundaria {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--espacio-medio);
 }
 
 /* Escritorio */
@@ -315,19 +444,35 @@ body {
     }
 
     .principal {
-        padding-bottom: var(--espacio-grande);
+        padding-bottom: var(--reserva-barra-inferior-escritorio);
     }
 
-    .barra-inferior {
-        position: static;
+    .fila-resultado {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--espacio-medio);
+    }
+
+    .fila-resultado-nombre {
+        flex: 1;
+    }
+
+    .barra-inferior-contenido {
         justify-content: space-between;
-        padding: 0;
-        background-color: transparent;
-        border-top: none;
     }
 
-    .barra-inferior .boton-principal {
+    .barra-inferior-contenido .boton-principal {
         flex: none;
+    }
+
+    .barra-inferior-resultados {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .barra-inferior-secundaria {
+        margin-right: auto;
     }
 }
 
