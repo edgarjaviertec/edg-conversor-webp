@@ -103,9 +103,15 @@ Glosario (usar siempre la misma palabra): `imagen`, `lote`, `conversion`,
 - La conversión corre en **Web Workers** para no bloquear la interfaz. Un
   pool fijo de trabajadores toma imágenes de una cola, una a la vez cada uno.
   Los buffers se transfieren (`postMessage(datos, [buffer])`), no se copian.
-- El `.wasm` se carga a mano (`WebAssembly.compileStreaming` + `init()`), así
-  el bundle IIFE no depende de `import.meta.url`. Sin la versión multihilo
-  del WASM (exigiría cabeceras COOP/COEP).
+- El trabajador llama a `JsquashWebp.init({ locateFile })` con la ruta de
+  `js/externos/`, así el bundle IIFE no depende de `import.meta.url`. jSquash
+  elige solo entre `webp_enc_simd.wasm` (unos 11–15 % más rápido) y
+  `webp_enc.wasm` (navegadores sin SIMD, como iOS 16.0–16.3); se publican
+  los dos. Sin la versión multihilo del WASM (exigiría cabeceras COOP/COEP).
+- Si la codificación falla (por ejemplo, el WASM se queda sin memoria), el
+  trabajador responde con un error, la imagen queda rechazada con ese motivo
+  y el trabajador se reemplaza (`terminate()` y uno nuevo), porque el módulo
+  WASM puede quedar inutilizable.
 - **Decodificación:** todas las imágenes en el hilo principal con
   `createImageBitmap` y canvas (respeta la orientación EXIF y conserva el
   canal alfa); el trabajador recibe el buffer RGBA y solo codifica.
@@ -141,10 +147,25 @@ como rechazada con su motivo; el resto del lote sigue.
 | Constante | Valor | Motivo |
 |---|---|---|
 | `LIMITE_LADO_PX` | `16383` | Máximo del formato WebP por lado |
-| `LIMITE_PIXELES_MOVIL` | `16777216` | Área máxima de canvas en iOS Safari (4096 × 4096) |
-| `LIMITE_PIXELES_ESCRITORIO` | `40000000` | Valor inicial, ajustar probando |
+| `LIMITE_PIXELES` | `50000000` | El mismo en todos los dispositivos; acepta fotos de 48 MP con margen |
 | `TRABAJADORES_MOVIL` | `1` | Un solo pico de memoria a la vez en iOS |
 | `TRABAJADORES_ESCRITORIO` | `3` | `min(navigator.hardwareConcurrency - 1, 3)` |
+
+Medido con el prototipo (octubre 2026):
+
+- **iPhone 16e (iOS 26):** fotos reales de 48 y 64 MP pasando por canvas, con
+  y sin pérdida, sin errores. Con pérdida, 24,5 MP en 1,6 s y 64 MP en 4,2 s;
+  sin pérdida, 48 MP en 22 s (6,7 MB → 22,5 MB). El canvas ya no tiene el
+  límite de 4096 × 4096 de iOS antiguo.
+- **Chrome 142 en Mac:** 100 MP con pérdida bien; 100 MP sin pérdida falla
+  con un error capturable ("Encoding error"), sin cerrar la pestaña.
+- **Safari 17.6 en Mac Intel antiguo:** sintéticas con pérdida bien hasta
+  128 MP; 256 MP falla con error capturable. Fotos reales: 48 MP en 12 s con
+  pérdida y 65 s sin pérdida; 64 MP sin pérdida en 98 s. En equipos lentos el
+  problema es el tiempo, no la memoria.
+- No se pudo probar iOS 16 ni teléfonos con poca memoria: el límite queda
+  en 50 MP y no en 64 MP para dejar margen. Si ahí falla una imagen, se
+  rechaza con su motivo y el lote sigue.
 
 Móvil se detecta con `matchMedia("(pointer: coarse)")` (el iPad se anuncia
 como Mac en el user agent).
@@ -159,7 +180,7 @@ Tres vistas; el estado guarda cuál se muestra:
   visualmente. Al hacer clic en cualquier parte se abre el selector. Dentro:
   icono, texto "Arrastra tus imágenes aquí o" (solo escritorio), un `<span>`
   con estilo de botón "Elegir imágenes" (nunca `<button>` dentro del label) y
-  el límite de MP según el dispositivo. Borde punteado, fondo de color sólido
+  el límite de MP. Borde punteado, fondo de color sólido
   sin imagen. `accept` sin `image/*` para que iOS convierta HEIC a JPG.
   Los WebP se aceptan para recomprimir; los WebP animados se rechazan
   (canvas solo tomaría el primer cuadro), detectándolo por el bit de
@@ -179,7 +200,10 @@ Tres vistas; el estado guarda cuál se muestra:
 - **Resultados:** aparece en cuanto se presiona Convertir. Lista en el orden
   de carga con estado por fila (en cola, convirtiendo, lista, rechazada con
   motivo), peso original, porcentaje y peso final; aumento de peso en otro
-  color. Descarga individual al terminar cada fila. Durante la conversión:
+  color. La fila que se está convirtiendo muestra un indicador animado con
+  CSS (libwebp no informa progreso dentro de una imagen y una foto grande sin
+  pérdida puede tardar más de un minuto en equipos lentos; sin el indicador
+  parece colgada). Descarga individual al terminar cada fila. Durante la conversión:
   progreso y "Cancelar" (`terminate()` de los trabajadores). Al cancelar,
   las ya convertidas siguen disponibles (individual y en el ZIP) y las
   pendientes quedan como "Cancelada". Al terminar o cancelar: ahorro total,
